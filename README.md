@@ -1,8 +1,13 @@
-before doing any starting any updates or changes, do git pull to fetch the curent version from github
+# Gold Rush Prototype
 
+This repo contains prototype files for **Gold Rush**, a game currently in active development. Things may be unfinished, broken, or change frequently. There is no guarantee that everything will work — this is a work in progress.
 
-GOLD RUSH PROTOTYPE-- This repo contains prototype files of the gold rush game. this is a developing game and there is no guarantee anything will work. We are still actively developing.
+This project is a fan-made remake of *The Oregon Trail*. It is being built completely from scratch.
 
-P.S. This is a fan remake of Oregon Trail from scratch
+## Status
+- 🚧 In development  
+- 🧪 Prototype build  
+- 🔄 Frequent updates and changes  
 
-The story.txt file is based off a google doc for only the devs, it may be a day behind, so please wait untill we get there to fix it.
+(DEV STUFF ONLY)
+If you're contributing, **always pull the latest version before making any changes**:
