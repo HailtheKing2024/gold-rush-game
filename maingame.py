@@ -6,9 +6,9 @@ pygame.font.init()
 
 # Set up display
 infoObject = pygame.display.Info()
-screen_width = infoObject.current_w
-screen_height = infoObject.current_h
-screen = pygame.display.set_mode((screen_width * 0.5, screen_height* 0.5))
+screen_width = (infoObject.current_w) * 0.9
+screen_height = (infoObject.current_h)* 0.9
+screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("The Gold Rush Game")
 
 # Colors
