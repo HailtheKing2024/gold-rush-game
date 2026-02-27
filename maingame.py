@@ -1,11 +1,25 @@
 import pygame
+
+# Initialize pygame
 pygame.init()
+pygame.font.init()
 
-screen = pygame.display.set_mode((640, 480))
-pygame.display.set_caption("Pygame Text Example")
+# Set up display
+screen_width = 800
+screen_height = 600
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Custom Font Example")
 
-# 1. & 2. Load font
-my_font = pygame.font.SysFont('Arial', 30)
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+
+# 1. Load the custom font (replace 'yourfontfile.ttf' with your actual file name and path)
+try:
+    custom_font = pygame.font.Font("ByteBounce.ttf", 40)
+except pygame.error:
+    print("Custom font not found, using default font.")
+    custom_font = pygame.font.Font(None, 40)
 
 running = True
 while running:
@@ -13,16 +27,20 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    # 3. Render the text (usually done inside the loop if text changes)
-    text_surface = my_font.render('Displaying text!', True, (255, 255, 255))
+    # Fill the screen with a background color
+    screen.fill(BLACK)
 
-    # Clear screen with a color (optional, e.g., black)
-    screen.fill((0, 0, 0))
+    # 2. Render the text
+    text_surface = custom_font.render("Hello with custom font!", True, WHITE)
 
-    # 4. Blit the text to the screen
-    screen.blit(text_surface, (100, 100))
+    # 3. Get the text rectangle for positioning (optional, but useful for centering)
+    text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2))
 
-    # Update the display to make changes visible
+    # 4. Blit the text surface to the screen
+    screen.blit(text_surface, text_rect)
+
+    # Update the display
     pygame.display.flip()
 
+# Quit pygame
 pygame.quit()
