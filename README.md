@@ -11,3 +11,4 @@ This project is a fan-made remake of *The Oregon Trail*. It is being built compl
 
 (DEV STUFF ONLY)
 If you're contributing, **always pull the latest version before making any changes**:
+When initializing venv always make sure to install from the requirements.txt file.
