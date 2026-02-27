@@ -18,10 +18,11 @@ BLACK = (0, 0, 0)
 
 # 1. Load the custom font 
 try:
-    custom_font = pygame.font.Font("ByteBounce.ttf", 40)
+    main_font = pygame.font.Font("ByteBounce.ttf", 40)
+    title_font = pygame.font.Font("ByteBounce.ttf", 150)
 except pygame.error:
-    print("Custom font not found, usindsg default font.")
-    custom_font = pygame.font.Font(None, 40)
+    print("Main font not found, usindsg default font.")
+    main_font = pygame.font.Font(None, 40)
 
 running = True
 while running:
@@ -33,16 +34,19 @@ while running:
     screen.fill(BLACK)
 
     # 2. Render the text
-    text_surface = custom_font.render("The Gold Rush Game!", True, GOLD)
-    text_surface2 = custom_font.render("Presented by HailtheKing, pretha809,betgyf,and astroawe!", True, GOLD)
+    text_surface = title_font.render("The Gold Rush Game!", True, GOLD)
+    text_surface2 = main_font.render("Presented by HailtheKing, pretha809,betgyf,and astroawe!", True, GOLD)
+    text_surface3 = main_font.render("A fan made game based on The Oregon Trail", True, GOLD)
 
     # 3. Get the text rectangle for positioning (optional, but useful for centering)
-    text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2))
-    text_rect2 = text_surface2.get_rect(center=(screen_width // 2, screen_height // 2 + 30))
+    text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
+    text_rect2 = text_surface2.get_rect(center=(screen_width // 2, screen_height // 2 + 20))
+    text_rect3 = text_surface3.get_rect(center=(screen_width // 2, screen_height // 2 + 50))
 
     # 4. Blit the text surface to the screen
     screen.blit(text_surface, text_rect)
     screen.blit(text_surface2, text_rect2)
+    screen.blit(text_surface3, text_rect3)
 
     # Update the display
     pygame.display.flip()
