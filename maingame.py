@@ -5,8 +5,9 @@ pygame.init()
 pygame.font.init()
 
 # Set up display
-screen_width = 800
-screen_height = 600
+infoObject = pygame.display.Info()
+screen_width = infoObject.current_w
+screen_height = infoObject.current_h
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Custom Font Example")
 
