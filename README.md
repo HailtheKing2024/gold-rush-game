@@ -5,4 +5,4 @@ GOLD RUSH PROTOTYPE-- This repo contains prototype files of the gold rush game. 
 
 P.S. This is a fan remake of Oregon Trail from scratch
 
-The story.txt file is based off a google doc for only the devs, it may be a day behind, so please wait untill we get there to fix it.
+The story.txt file is based off a google doc for only the devs, it may be a day behind, so please wait untill we get there to fix it. Preran Cake and bjishables
