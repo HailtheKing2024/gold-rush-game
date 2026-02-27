@@ -15,7 +15,7 @@ pygame.display.set_caption("Custom Font Example")
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-# 1. Load the custom font (replace 'yourfontfile.ttf' with your actual file name and path)
+# 1. Load the custom font 
 try:
     custom_font = pygame.font.Font("ByteBounce.ttf", 40)
 except pygame.error:
