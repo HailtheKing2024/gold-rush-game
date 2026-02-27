@@ -13,6 +13,7 @@ pygame.display.set_caption("Custom Font Example")
 
 # Colors
 WHITE = (255, 255, 255)
+GOLD = (255,215,0)
 BLACK = (0, 0, 0)
 
 # 1. Load the custom font 
@@ -32,7 +33,7 @@ while running:
     screen.fill(BLACK)
 
     # 2. Render the text
-    text_surface = custom_font.render("Hello with custom font!", True, WHITE)
+    text_surface = custom_font.render("The Gold Rush Game!", True, GOLD)
 
     # 3. Get the text rectangle for positioning (optional, but useful for centering)
     text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2))
