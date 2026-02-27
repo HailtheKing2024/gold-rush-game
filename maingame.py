@@ -1,4 +1,4 @@
-import pygame-ce
+import pygame
 
 # Initialize pygame
 pygame.init()
