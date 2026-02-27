@@ -34,12 +34,15 @@ while running:
 
     # 2. Render the text
     text_surface = custom_font.render("The Gold Rush Game!", True, GOLD)
+    text_surface2 = custom_font.render("Presented by HailtheKing, pretha809,betgyf,and astroawe!", True, GOLD)
 
     # 3. Get the text rectangle for positioning (optional, but useful for centering)
     text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2))
+    text_rect2 = text_surface2.get_rect(center=(screen_width // 2, screen_height // 2 + 30))
 
     # 4. Blit the text surface to the screen
     screen.blit(text_surface, text_rect)
+    screen.blit(text_surface2, text_rect2)
 
     # Update the display
     pygame.display.flip()
