@@ -20,7 +20,7 @@ BLACK = (0, 0, 0)
 try:
     custom_font = pygame.font.Font("ByteBounce.ttf", 40)
 except pygame.error:
-    print("Custom font not found, using default font.")
+    print("Custom font not found, usindsg default font.")
     custom_font = pygame.font.Font(None, 40)
 
 running = True
