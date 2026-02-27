@@ -5,4 +5,3 @@ GOLD RUSH PROTOTYPE-- This repo contains prototype files of the gold rush game. 
 
 P.S. This is a fan remake of Oregon Trail from scratch
 
-yippe_Fah
