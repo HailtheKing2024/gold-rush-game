@@ -37,7 +37,7 @@ banner_surf = main_font.render(banner_text, True, GOLD)
 # starting X position (off the right edge)
 banner_x = screen_width
 banner_y = screen_height - banner_surf.get_height() - 10  # 10px margin
-banner_speed = 0.1  # pixels per frame
+banner_speed = 2  # pixels per frame
 
 running = True
 async def main():
