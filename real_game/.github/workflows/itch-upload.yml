@@ -1,0 +1,18 @@
+name: Upload to itch.io
+on: [push] # Triggers every time you push code
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Butler
+        uses: remarkablegames/setup-butler@v2
+
+      - name: Push to itch.io
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          butler push ./docs hailtheking/https://hailtheking.itch.io/gold-rush-game:windows-alpha
