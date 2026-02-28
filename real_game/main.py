@@ -30,7 +30,7 @@ button_rect = button_surf.get_rect(center=(screen_width // 2,
                                            screen_height // 2 + 150))
 
 # scrolling banner text at bottom
-banner_text = "****BETA VERSION 0.1.0  EXPECT BUGS!****"
+banner_text = "BETA VERSION 0.1.0  EXPECT BUGS!"
 # render once; we'll blit it repeatedly as it scrolls
 banner_surf = main_font.render(banner_text, True, GOLD)
 # starting X position (off the right edge)
