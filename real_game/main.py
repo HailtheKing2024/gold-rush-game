@@ -29,6 +29,15 @@ button_surf = main_font.render("New save", True, GOLD)
 button_rect = button_surf.get_rect(center=(screen_width // 2,
                                            screen_height // 2 + 150))
 
+# scrolling banner text at bottom
+banner_text = "****BETA VERSION 0.1.0  EXPECT BUGS!****"
+# render once; we'll blit it repeatedly as it scrolls
+banner_surf = main_font.render(banner_text, True, GOLD)
+# starting X position (off the right edge)
+banner_x = screen_width
+banner_y = screen_height - banner_surf.get_height() - 10  # 10px margin
+banner_speed = 0.1  # pixels per frame
+
 running = True
 while running:
     for event in pygame.event.get():
@@ -63,6 +72,13 @@ while running:
     pygame.draw.rect(screen, WHITE, bg_rect)
     pygame.draw.rect(screen, GOLD, bg_rect, 2)
     screen.blit(button_surf, button_rect)
+
+    # update banner position and draw it
+    banner_x -= banner_speed
+    # if it has completely scrolled past the left edge, wrap to right
+    if banner_x < -banner_surf.get_width():
+        banner_x = screen_width
+    screen.blit(banner_surf, (banner_x, banner_y))
 
     # Update the display
     pygame.display.flip()
