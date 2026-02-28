@@ -2,6 +2,9 @@
   font-family: "ByteBounce";
   src: url("ByteBounce.ttf") format("truetype");
 }
+body{
+    background-color: black;
+}
 .tutorial-container {
         width: 90vw;
         height: 90vh;
