@@ -1,4 +1,5 @@
 import pygame
+import asyncio
 
 # Initialize pygame
 pygame.init()
@@ -39,49 +40,51 @@ banner_y = screen_height - banner_surf.get_height() - 10  # 10px margin
 banner_speed = 0.1  # pixels per frame
 
 running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            if button_rect.collidepoint(event.pos):
-                # the user clicked the "New save" button
-                print("New save clicked – create a new save here")
-                # TODO: call your save‑creation function
+async def main():
+    global running, banner_x
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if button_rect.collidepoint(event.pos):
+                    # the user clicked the "New save" button
+                    print("New save clicked – create a new save here")
+                    # TODO: call your save‑creation function
 
-    # Fill the screen with a background color
-    screen.fill(BLACK)
+        # Fill the screen with a background color
+        screen.fill(BLACK)
 
-    # 2. Render the text
-    text_surface = title_font.render("The Gold Rush Game!", True, GOLD)
-    text_surface2 = main_font.render("Presented by HailtheKing, pretha809,betgyf,and astroawe!", True, GOLD)
-    text_surface3 = main_font.render("A fan made game based on The Oregon Trail", True, GOLD)
+        # 2. Render the text
+        text_surface = title_font.render("The Gold Rush Game!", True, GOLD)
+        text_surface2 = main_font.render("Presented by HailtheKing, pretha809,betgyf,and astroawe!", True, GOLD)
+        text_surface3 = main_font.render("A fan made game based on The Oregon Trail", True, GOLD)
 
-    # 3. Get the text rectangle for positioning (optional, but useful for centering)
-    text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
-    text_rect2 = text_surface2.get_rect(center=(screen_width // 2, screen_height // 2 + 20))
-    text_rect3 = text_surface3.get_rect(center=(screen_width // 2, screen_height // 2 + 50))
+        # 3. Get the text rectangle for positioning (optional, but useful for centering)
+        text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2 - 50))
+        text_rect2 = text_surface2.get_rect(center=(screen_width // 2, screen_height // 2 + 20))
+        text_rect3 = text_surface3.get_rect(center=(screen_width // 2, screen_height // 2 + 50))
 
-    # 4. Blit the text surface to the screen
-    screen.blit(text_surface, text_rect)
-    screen.blit(text_surface2, text_rect2)
-    screen.blit(text_surface3, text_rect3)
+        # 4. Blit the text surface to the screen
+        screen.blit(text_surface, text_rect)
+        screen.blit(text_surface2, text_rect2)
+        screen.blit(text_surface3, text_rect3)
 
-    # draw the button (background + text)
-    bg_rect = button_rect.inflate(20, 10)
-    pygame.draw.rect(screen, WHITE, bg_rect)
-    pygame.draw.rect(screen, GOLD, bg_rect, 2)
-    screen.blit(button_surf, button_rect)
+        # draw the button (background + text)
+        bg_rect = button_rect.inflate(20, 10)
+        pygame.draw.rect(screen, WHITE, bg_rect)
+        pygame.draw.rect(screen, GOLD, bg_rect, 2)
+        screen.blit(button_surf, button_rect)
 
-    # update banner position and draw it
-    banner_x -= banner_speed
-    # if it has completely scrolled past the left edge, wrap to right
-    if banner_x < -banner_surf.get_width():
-        banner_x = screen_width
-    screen.blit(banner_surf, (banner_x, banner_y))
+        # update banner position and draw it
+        banner_x -= banner_speed
+        # if it has completely scrolled past the left edge, wrap to right
+        if banner_x < -banner_surf.get_width():
+            banner_x = screen_width
+        screen.blit(banner_surf, (banner_x, banner_y))
 
-    # Update the display
-    pygame.display.flip()
+        # Update the display
+        pygame.display.flip()
+        await asyncio.sleep(0)
 
-# Quit pygame
-pygame.quit()
+asyncio.run(main())
