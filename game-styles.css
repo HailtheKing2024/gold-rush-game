@@ -1,0 +1,64 @@
+/* Load custom font */
+@font-face {
+    font-family: "ByteBounce";
+    src: url("ByteBounce.ttf") format("truetype");
+}
+
+/* Reset */
+body {
+    margin: 0;
+    background-color: black;
+    font-family: "ByteBounce", sans-serif;
+    overflow: hidden;
+}
+
+/* Main container */
+.game-container {
+    width: 90vw;
+    height: 90vh;
+    margin: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: gold;
+    text-align: center;
+}
+
+/* Title */
+.title {
+    font-size: 100px;
+    margin-bottom: 20px;
+}
+
+/* Subtitle */
+.subtitle {
+    font-size: 24px;
+    margin: 5px 0;
+}
+
+/* Button */
+#newSaveBtn {
+    margin-top: 40px;
+    padding: 15px 40px;
+    font-size: 28px;
+    background-color: white;
+    border: 2px solid gold;
+    color: gold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* Hover effect */
+#newSaveBtn:hover {
+    background-color: #cccccc;
+}
+
+/* Scrolling banner */
+.banner {
+    position: absolute;
+    bottom: 10px;
+    white-space: nowrap;
+    font-size: 22px;
+}
