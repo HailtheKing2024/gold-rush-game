@@ -18,11 +18,13 @@
       }
 
       .tutorial-container h1 {
+        font-family: "ByteBounce", sans-serif;
         font-size: 80px;
         margin-bottom: 30px;
       }
 
       .tutorial-container p {
+        font-family: "ByteBounce", sans-serif;
         font-size: 20px;
         margin: 15px 0;
         max-width: 800px;
