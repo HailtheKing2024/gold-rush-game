@@ -1,17 +1,9 @@
 {
   "name": "gold-rush-game",
   "version": "0.1.0",
-  "description": "Prototype of the Gold Rush browser game with a simple leaderboard API.",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
+  "description": "Gold Rush game with a global leaderboard powered by Upstash Redis.",
+  "private": true,
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
     "@upstash/redis": "^1.25.0"
-  },
-  "engines": {
-    "node": ">=12"
   }
 }
