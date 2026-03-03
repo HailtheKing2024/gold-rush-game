@@ -20,7 +20,14 @@ export default async function handler(req, res) {
         headers: { Authorization: `Bearer ${redisToken}` },
       });
       const data = await response.json();
-      const scores = data.result ? JSON.parse(data.result) : [];
+      let scores = [];
+      if (data.result) {
+        try {
+          scores = JSON.parse(data.result);
+        } catch {
+          scores = [];
+        }
+      }
       return res.json(scores);
     }
 
@@ -36,16 +43,23 @@ export default async function handler(req, res) {
         headers: { Authorization: `Bearer ${redisToken}` },
       });
       const getData = await getResponse.json();
-      const scores = getData.result ? JSON.parse(getData.result) : [];
+      let scores = [];
+      if (getData.result) {
+        try {
+          scores = JSON.parse(getData.result);
+        } catch {
+          scores = [];
+        }
+      }
 
       // Add new score
       scores.push({ name, score, timestamp: Date.now() });
 
-      // Save back
+      // Save back to Redis
       const setResponse = await fetch(`${redisUrl}/set/leaderboard_scores`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(JSON.stringify(scores)),
+        headers: { Authorization: `Bearer ${redisToken}` },
+        body: JSON.stringify(scores),
       });
 
       if (!setResponse.ok) {
@@ -58,6 +72,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   } catch (err) {
     console.error('Leaderboard error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error: ' + err.message });
   }
 }
