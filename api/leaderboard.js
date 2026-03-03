@@ -4,74 +4,80 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.status(200).end();
+    return;
   }
 
-  const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
-  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-  if (!redisUrl || !redisToken) {
-    return res.status(500).json({ error: 'Redis credentials not configured' });
+  if (!url || !token) {
+    res.status(500).json({ error: 'Config missing' });
+    return;
   }
 
   try {
     if (req.method === 'GET') {
-      const response = await fetch(`${redisUrl}/get/leaderboard_scores`, {
-        headers: { Authorization: `Bearer ${redisToken}` },
+      const r = await fetch(url + '/get/leaderboard_scores', {
+        headers: { Authorization: 'Bearer ' + token },
       });
-      const data = await response.json();
-      let scores = [];
-      if (data.result) {
+      const d = await r.json();
+      let s = [];
+      if (d && d.result) {
         try {
-          scores = JSON.parse(data.result);
+          s = JSON.parse(d.result);
+          if (!Array.isArray(s)) s = [];
         } catch {
-          scores = [];
+          s = [];
         }
       }
-      return res.json(scores);
+      res.json(s);
+      return;
     }
 
     if (req.method === 'POST') {
-      const { name, score } = req.body;
+      const body = req.body || {};
+      const name = body.name;
+      const score = body.score;
 
-      if (typeof name !== 'string' || typeof score !== 'number') {
-        return res.status(400).json({ error: 'Invalid name or score' });
+      if (!name || typeof name !== 'string' || typeof score !== 'number') {
+        res.status(400).json({ error: 'Bad input' });
+        return;
       }
 
-      // Get current scores
-      const getResponse = await fetch(`${redisUrl}/get/leaderboard_scores`, {
-        headers: { Authorization: `Bearer ${redisToken}` },
+      const r1 = await fetch(url + '/get/leaderboard_scores', {
+        headers: { Authorization: 'Bearer ' + token },
       });
-      const getData = await getResponse.json();
-      let scores = [];
-      if (getData.result) {
+      const d1 = await r1.json();
+      let s = [];
+      if (d1 && d1.result) {
         try {
-          scores = JSON.parse(getData.result);
+          s = JSON.parse(d1.result);
+          if (!Array.isArray(s)) s = [];
         } catch {
-          scores = [];
+          s = [];
         }
       }
 
-      // Add new score
-      scores.push({ name, score, timestamp: Date.now() });
+      s.push({ name: name, score: score, timestamp: Date.now() });
 
-      // Save back to Redis
-      const setResponse = await fetch(`${redisUrl}/set/leaderboard_scores`, {
+      const r2 = await fetch(url + '/set/leaderboard_scores', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${redisToken}` },
-        body: JSON.stringify(scores),
+        headers: { Authorization: 'Bearer ' + token },
+        body: JSON.stringify(s),
       });
 
-      if (!setResponse.ok) {
-        throw new Error('Failed to save score');
+      if (r2.ok) {
+        res.status(201).json({ ok: true });
+      } else {
+        res.status(500).json({ error: 'Save failed' });
       }
-
-      return res.status(201).json({ ok: true });
+      return;
     }
 
-    return res.status(405).json({ error: 'Method not allowed' });
-  } catch (err) {
-    console.error('Leaderboard error:', err);
-    return res.status(500).json({ error: 'Internal server error: ' + err.message });
+    res.status(405).end();
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Error' });
   }
 }
