@@ -40,7 +40,7 @@ body {
 
 /* Buttons - reused by all controls */
 button {
-    font-family: "ByteBounce", sans-serif;
+  font-family: "ByteBounce", sans-serif;
   padding: 15px 40px;
   font-size: 28px;
   background-color: white;
