@@ -1,9 +1,0 @@
-{
-  "name": "gold-rush-game",
-  "version": "0.1.0",
-  "description": "Gold Rush game with a global leaderboard powered by Upstash Redis.",
-  "private": true,
-  "dependencies": {
-    "@upstash/redis": "^1.25.0"
-  }
-}

@@ -1,10 +1,3 @@
-import { Redis } from '@upstash/redis';
-
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -14,10 +7,21 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (!redisUrl || !redisToken) {
+    return res.status(500).json({ error: 'Redis credentials not configured' });
+  }
+
   try {
     if (req.method === 'GET') {
-      const scores = await redis.get('leaderboard_scores');
-      return res.json(scores || []);
+      const response = await fetch(`${redisUrl}/get/leaderboard_scores`, {
+        headers: { Authorization: `Bearer ${redisToken}` },
+      });
+      const data = await response.json();
+      const scores = data.result ? JSON.parse(data.result) : [];
+      return res.json(scores);
     }
 
     if (req.method === 'POST') {
@@ -27,9 +31,26 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid name or score' });
       }
 
-      const scores = await redis.get('leaderboard_scores') || [];
+      // Get current scores
+      const getResponse = await fetch(`${redisUrl}/get/leaderboard_scores`, {
+        headers: { Authorization: `Bearer ${redisToken}` },
+      });
+      const getData = await getResponse.json();
+      const scores = getData.result ? JSON.parse(getData.result) : [];
+
+      // Add new score
       scores.push({ name, score, timestamp: Date.now() });
-      await redis.set('leaderboard_scores', scores);
+
+      // Save back
+      const setResponse = await fetch(`${redisUrl}/set/leaderboard_scores`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${redisToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(JSON.stringify(scores)),
+      });
+
+      if (!setResponse.ok) {
+        throw new Error('Failed to save score');
+      }
 
       return res.status(201).json({ ok: true });
     }
