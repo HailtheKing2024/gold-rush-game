@@ -1,4 +1,9 @@
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -11,7 +16,7 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      const scores = await kv.get('leaderboard_scores');
+      const scores = await redis.get('leaderboard_scores');
       return res.json(scores || []);
     }
 
@@ -22,9 +27,9 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid name or score' });
       }
 
-      const scores = await kv.get('leaderboard_scores') || [];
+      const scores = await redis.get('leaderboard_scores') || [];
       scores.push({ name, score, timestamp: Date.now() });
-      await kv.set('leaderboard_scores', scores);
+      await redis.set('leaderboard_scores', scores);
 
       return res.status(201).json({ ok: true });
     }
