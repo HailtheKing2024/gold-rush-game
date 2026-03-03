@@ -17,5 +17,5 @@ Help is appreciatted on how to make this a webpage.
 
 Be sure to check out the real game on https://goldrushgame.netlify.app/index.html!
 
-
+check
 
