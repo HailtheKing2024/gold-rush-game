@@ -15,3 +15,20 @@ When initializing venv always make sure to install from the requirements.txt fil
 Help is appreciatted on how to make this a webpage.
 
 Be sure to check out the real game on https://goldrushgame.netlify.app/index.html!
+
+## Leaderboard
+A new **Leaderboard** button lets players view and submit high scores. The leaderboard is backed by a simple Node/Express API that stores entries in `leaderboard.json`.
+
+### Running the server locally
+1. Install Node.js (v12+).
+2. `npm install` to pull in `express` and `cors`.
+3. `npm start` to launch the server; point your browser to `http://localhost:3000`.
+   - The API endpoints are `GET /api/leaderboard` and `POST /api/leaderboard`.
+   - You can deploy this to any hosting provider (Heroku, Vercel, etc.) to make the leaderboard global.
+
+When hosted publicly, all clients hitting the same server will see a globally shared scoreboard.
+
+> **Tip:** the example implementation uses a local JSON file. In production you may want to
+> hook the API up to a proper cloud database such as Firebase Firestore, MongoDB Atlas,
+> PostgreSQL, etc. Replace the `loadScores`/`saveScores` helpers in `server.js` with
+> a real query layer and deploy the Node process or use a serverless function.

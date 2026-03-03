@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Leaderboard - The Gold Rush Game</title>
+    <link rel="stylesheet" href="game-styles.css" />
+  </head>
+  <body>
+    <div class="game-container">
+      <h1 class="title">Leaderboard</h1>
+      <div id="scores-container">
+        <p>Loading scores...</p>
+      </div>
+
+      <form id="scoreForm">
+        <h2>Submit Your Score</h2>
+        <label for="nameInput">Name:</label>
+        <input type="text" id="nameInput" required minlength="1" maxlength="20" />
+        <br />
+        <label for="scoreInput">Score:</label>
+        <input type="number" id="scoreInput" required min="0" />
+        <br />
+        <button type="submit">Send</button>
+      </form>
+
+      <button id="backBtn">Back to Game</button>
+    </div>
+
+    <script src="leaderboard.js"></script>
+  </body>
+</html>

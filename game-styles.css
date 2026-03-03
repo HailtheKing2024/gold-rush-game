@@ -38,10 +38,9 @@ body {
   margin: 5px 0;
 }
 
-/* Button */
-#newSaveBtn {
+/* Buttons - reused by all controls */
+button {
     font-family: "ByteBounce", sans-serif;
-  margin-top: 40px;
   padding: 15px 40px;
   font-size: 28px;
   background-color: white;
@@ -49,19 +48,17 @@ body {
   color: gold;
   cursor: pointer;
   transition: 0.2s;
+  margin-top: 20px;
 }
 
-/* How to Play Button */
-#howToPlayBtn {
-    font-family: "ByteBounce", sans-serif;
-  margin-top: 20px;
-  padding: 15px 40px;
-  font-size: 28px;
-  background-color: white;
-  border: 2px solid gold;
-  color: gold;
-  cursor: pointer;
-  transition: 0.2s;
+/* Individual margins for the first button */
+#newSaveBtn {
+  margin-top: 40px;
+}
+
+/* Hover effect */
+button:hover {
+  background-color: #cccccc;
 }
 
 /* Hover effect */

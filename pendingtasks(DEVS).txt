@@ -1,1 +1,3 @@
 PENDING TASKS
+- add global leaderboard page with database-backed API
+
