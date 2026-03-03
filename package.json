@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "devDependencies": {
+    "@vercel/node": "^2.15.0"
+  }
+}
