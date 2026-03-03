@@ -8,8 +8,8 @@
   ],
   "routes": [
     {
-      "src": "/api/leaderboard",
-      "dest": "/api/leaderboard.js"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     },
     {
       "src": "/(.*)",
@@ -17,3 +17,4 @@
     }
   ]
 }
+
