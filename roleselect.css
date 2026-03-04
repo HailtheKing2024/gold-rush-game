@@ -1,0 +1,68 @@
+@font-face {
+  font-family: "ByteBounce";
+  src: url("ByteBounce.ttf") format("truetype");
+}
+
+body {
+  background-color: black;
+  margin: 0;
+  padding: 0;
+}
+
+/* Main Container */
+.role-container {
+  width: 90vw;
+  height: 90vh;
+  margin: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  color: gold;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+/* Title */
+.role-container h1 {
+  font-family: "ByteBounce", sans-serif;
+  font-size: 80px;
+  margin-bottom: 40px;
+}
+
+/* Role Buttons Wrapper */
+.roles {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Individual Role Button */
+.roleBtn {
+  padding: 20px 50px;
+  font-size: 28px;
+  background-color: white;
+  border: 2px solid gold;
+  color: gold;
+  cursor: pointer;
+  transition: 0.2s;
+  font-family: "ByteBounce", sans-serif;
+  min-width: 200px;
+}
+
+/* Hover Effect */
+.roleBtn:hover {
+  background-color: #cccccc;
+  transform: scale(1.05);
+}
+
+/* Optional Description Text */
+.role-description {
+  font-family: "ByteBounce", sans-serif;
+  font-size: 18px;
+  margin-top: 10px;
+  max-width: 300px;
+  color: #e6c200;
+}

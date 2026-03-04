@@ -19,10 +19,21 @@ function animateBanner() {
 
 // Button click handlers
 newSaveBtn.addEventListener("click", () => {
-    console.log("New save clicked – create a new save here");
-    alert("New Save Created! (Placeholder)");
-});
 
+    const saveData = {
+        gold: 0,
+        day: 1,
+        food: 100,
+        morale: 100,
+        location: "start",
+        role: null
+    };
+
+    localStorage.setItem("goldRushSave", JSON.stringify(saveData));
+
+    // Go to role selection page
+    window.location.href = "roleSelect.html";
+});
 howToPlayBtn.addEventListener("click", () => {
     window.location.href = "tutorial.html";
 });
