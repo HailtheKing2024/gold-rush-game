@@ -1,5 +1,3 @@
-// This script is loaded both on index.html (for the button) and on leaderboard.html
-
 // helper to query API
 async function fetchScores() {
     const res = await fetch('/api/leaderboard');
@@ -7,17 +5,18 @@ async function fetchScores() {
     return res.json(); // each entry now includes id, score, name, timestamp
 }
 
-function formatScore(entry) {
+// format a single score entry with rank
+function formatScore(entry, rank) {
     const date = new Date(entry.timestamp);
-    // entry.id is included but not displayed; ready for future deletion if needed
     return `<tr>
+                <td>${rank}</td>
                 <td>${entry.name}</td>
                 <td>${entry.score}</td>
                 <td>${date.toLocaleString()}</td>
             </tr>`;
 }
 
-// index page: hook leaderboard button to open the page
+// index page: leaderboard button
 if (document.getElementById('leaderboardBtn')) {
     document.getElementById('leaderboardBtn').addEventListener('click', () => {
         window.location.href = 'leaderboard.html';
@@ -38,11 +37,13 @@ if (document.getElementById('scores-container')) {
                 return;
             }
 
-            // Backend already returns top 10 sorted; no need to sort in frontend
-            const rows = scores.map(formatScore).join('');
+            // map each score to a table row with rank
+            const rows = scores.map((entry, index) => formatScore(entry, index + 1)).join('');
+
             container.innerHTML = `<table>
                                         <thead>
                                             <tr>
+                                                <th>Rank</th>
                                                 <th>Name</th>
                                                 <th>Score</th>
                                                 <th>Date</th>
@@ -50,7 +51,6 @@ if (document.getElementById('scores-container')) {
                                         </thead>
                                         <tbody>${rows}</tbody>
                                     </table>`;
-
         } catch (err) {
             container.innerHTML = `<p>Error loading leaderboard: ${err.message}</p>`;
         }
