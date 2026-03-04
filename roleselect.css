@@ -66,3 +66,9 @@ body {
   max-width: 300px;
   color: #e6c200;
 }
+.role-stats {
+  font-family: inherit;       /* Match the rest of the text */
+  font-size: 1rem;             /* Same size as descriptions */
+  margin-top: 5px;
+  color: #333;                 /* Adjust color to match your design */
+}
