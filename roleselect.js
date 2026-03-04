@@ -1,8 +1,8 @@
 // Base stats for each role
 const roles = {
-  miner: { gold: 100, food: 50, trading: 1, difficulty: "medium" },
-  hunter: { gold: 50, food: 100, trading: 1, difficulty: "hard" },
-  merchant: { gold: 50, food: 50, trading: 2, difficulty: "easy" }
+  miner: { gold: 50, food: 50, trading: 1, difficulty: "medium" },
+  hunter: { gold: 50, food: 50, trading: 1, difficulty: "hard" },
+  merchant: { gold: 50, food: 50, trading: 1, difficulty: "easy" }
 };
 
 // Difficulty multipliers
