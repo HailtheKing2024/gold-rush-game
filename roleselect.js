@@ -24,11 +24,17 @@ document.querySelectorAll(".roles > div").forEach(div => {
     trading: parseFloat((role.trading * diff.trading).toFixed(1))
   };
 
-  div.querySelector(".role-stats").innerText = 
+  div.querySelector(".role-stats").innerText =
     `Difficulty: ${role.difficulty.toUpperCase()} | Gold: ${finalStats.gold} | Food: ${finalStats.food} | Trading: ${finalStats.trading}`;
+
+  // Optional: color code difficulty
+  const statsEl = div.querySelector(".role-stats");
+  if (role.difficulty === "easy") statsEl.style.color = "green";
+  if (role.difficulty === "medium") statsEl.style.color = "orange";
+  if (role.difficulty === "hard") statsEl.style.color = "red";
 });
 
-// Optional: handle clicking a role
+// Handle clicking a role
 document.querySelectorAll(".roleBtn").forEach(button => {
   button.addEventListener("click", () => {
     const roleKey = button.dataset.role;
@@ -45,6 +51,11 @@ document.querySelectorAll(".roleBtn").forEach(button => {
     console.log(`Assigned Difficulty: ${role.difficulty}`);
     console.log("Final Stats:", finalStats);
 
-    // TODO: pass finalStats to your game logic
+    // Save stats in localStorage to use in startinggame.html
+    localStorage.setItem("selectedRole", roleKey);
+    localStorage.setItem("roleStats", JSON.stringify(finalStats));
+
+    // Redirect to startinggame.html
+    window.location.href = "startinggame.html";
   });
 });
