@@ -32,7 +32,7 @@ newSaveBtn.addEventListener("click", () => {
     localStorage.setItem("goldRushSave", JSON.stringify(saveData));
 
     // Go to role selection page
-    window.location.href = "roleSelect.html";
+    window.location.href = "roleselect.html";
 });
 howToPlayBtn.addEventListener("click", () => {
     window.location.href = "tutorial.html";

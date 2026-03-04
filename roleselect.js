@@ -16,6 +16,6 @@ roleButtons.forEach(button => {
         console.log("Role selected:", selectedRole);
 
         // Go to main game
-        window.location.href = "game.html"; // change if needed
+        window.location.href = "startinggame.html"; // change if needed
     });
 });
