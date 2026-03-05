@@ -12,17 +12,15 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve all static frontend files from the project root
+// Serve static frontend files
 app.use(express.static(__dirname));
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
-
-const REDIS_URL = process.env.REDIS_URL;
+const REDIS_URL = process.env.REDIS_URL; // Aiven Redis connection string
 const LEADERBOARD_KEY = "leaderboard_scores";
 const MAX_ENTRIES = 10;
 
+// Connect to Redis
 const client = createClient({ url: REDIS_URL });
 (async () => {
   try {
@@ -34,15 +32,20 @@ const client = createClient({ url: REDIS_URL });
   }
 })();
 
-// GET top leaderboard with JSON parsing for timestamps
+// GET leaderboard
 app.get("/api/leaderboard", async (req, res) => {
   try {
     const top = await client.zRangeWithScores(LEADERBOARD_KEY, -MAX_ENTRIES, -1, { REV: true });
     const parsed = top.map(e => {
       try {
-        return JSON.parse(e.value);
+        const obj = JSON.parse(e.value);
+        return {
+          id: obj.id,
+          name: obj.name,
+          score: obj.score,
+          timestamp: obj.timestamp // ISO string
+        };
       } catch {
-        // fallback if old data is plain string
         return { id: nanoid(), name: e.value, score: e.score, timestamp: null };
       }
     });
@@ -53,13 +56,19 @@ app.get("/api/leaderboard", async (req, res) => {
   }
 });
 
-// POST new score with timestamp stored as JSON string
+// POST new score
 app.post("/api/leaderboard", async (req, res) => {
   try {
     const { name, score } = req.body;
     if (!name || typeof score !== "number") return res.status(400).json({ error: "Bad input" });
 
-    const entry = JSON.stringify({ id: nanoid(), name, score, timestamp: Date.now() });
+    const entry = JSON.stringify({
+      id: nanoid(),
+      name,
+      score,
+      timestamp: new Date().toISOString() // ISO string timestamp
+    });
+
     await client.zAdd(LEADERBOARD_KEY, [{ value: entry, score }]);
     await client.zRemRangeByRank(LEADERBOARD_KEY, 0, -MAX_ENTRIES - 1);
 
@@ -70,15 +79,13 @@ app.post("/api/leaderboard", async (req, res) => {
   }
 });
 
-// DELETE by name (removes JSON entries that include name)
+// DELETE score by name
 app.delete("/api/leaderboard/:name", async (req, res) => {
   try {
     const nameToRemove = req.params.name;
     if (!nameToRemove) return res.status(400).json({ error: "Name required" });
 
-    // Get all entries
     const allEntries = await client.zRange(LEADERBOARD_KEY, 0, -1);
-    // Find entries containing the name
     const toRemove = allEntries.filter(entry => {
       try {
         const obj = JSON.parse(entry);
@@ -90,9 +97,7 @@ app.delete("/api/leaderboard/:name", async (req, res) => {
 
     if (toRemove.length === 0) return res.status(404).json({ error: "Name not found" });
 
-    // Remove all matching entries
     const removedCount = await client.zRem(LEADERBOARD_KEY, ...toRemove);
-
     res.json({ ok: true, removed: removedCount });
   } catch (err) {
     console.error(err);

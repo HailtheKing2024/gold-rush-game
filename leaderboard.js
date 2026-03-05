@@ -1,19 +1,21 @@
-// helper to query API
+// leaderboard.js
+
+// Fetch leaderboard data from backend
 async function fetchScores() {
     const res = await fetch('/api/leaderboard');
     if (!res.ok) throw new Error('Failed to load scores');
-    return res.json(); // each entry now includes id, score, name, timestamp
+    return res.json(); // entries include id, name, score, timestamp
 }
 
-// format a single score entry with rank
+// Format a single leaderboard row with rank and colored ranks
 function formatScore(entry, rank) {
-    const date = new Date(entry.timestamp);
+    const date = entry.timestamp ? new Date(entry.timestamp) : new Date();
 
-    let color = ''; // default color for other ranks
+    let color = '';
     if (rank === 1) color = 'gold';
     else if (rank === 2) color = 'silver';
     else if (rank === 3) color = '#cd7f32'; // bronze
-    else color = '#444'; // darker gray for the rest
+    else color = '#444';
 
     return `<tr style="color:${color}">
                 <td>${rank}</td>
@@ -23,71 +25,80 @@ function formatScore(entry, rank) {
             </tr>`;
 }
 
-// index page: leaderboard button
-if (document.getElementById('leaderboardBtn')) {
-    document.getElementById('leaderboardBtn').addEventListener('click', () => {
-        window.location.href = 'leaderboard.html';
-    });
+// Render the leaderboard table
+async function renderLeaderboard(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    try {
+        const scores = await fetchScores();
+        if (scores.length === 0) {
+            container.innerHTML = '<p>No scores yet.</p>';
+            return;
+        }
+
+        const rows = scores.map((entry, index) => formatScore(entry, index + 1)).join('');
+
+        container.innerHTML = `<table>
+                                    <thead>
+                                        <tr>
+                                            <th>Rank</th>
+                                            <th>Name</th>
+                                            <th>Score</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>${rows}</tbody>
+                                </table>`;
+    } catch (err) {
+        container.innerHTML = `<p>Error loading leaderboard: ${err.message}</p>`;
+    }
 }
 
-// leaderboard page: display scores and handle submit
-if (document.getElementById('scores-container')) {
-    const container = document.getElementById('scores-container');
-    const form = document.getElementById('scoreForm');
-    const backBtn = document.getElementById('backBtn');
-
-    async function refresh() {
-        try {
-            const scores = await fetchScores();
-            if (scores.length === 0) {
-                container.innerHTML = '<p>No scores yet.</p>';
-                return;
-            }
-
-            // map each score to a table row with rank
-            const rows = scores.map((entry, index) => formatScore(entry, index + 1)).join('');
-
-            container.innerHTML = `<table>
-                                        <thead>
-                                            <tr>
-                                                <th>Rank</th>
-                                                <th>Name</th>
-                                                <th>Score</th>
-                                                <th>Date</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>${rows}</tbody>
-                                    </table>`;
-        } catch (err) {
-            container.innerHTML = `<p>Error loading leaderboard: ${err.message}</p>`;
-        }
-    }
+// Handle score submission
+function setupScoreForm(formId, containerId) {
+    const form = document.getElementById(formId);
+    if (!form) return;
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const name = document.getElementById('nameInput').value.trim();
-        const score = parseInt(document.getElementById('scoreInput').value, 10);
+        const nameInput = form.querySelector('input[name="name"]');
+        const scoreInput = form.querySelector('input[name="score"]');
+
+        const name = nameInput.value.trim();
+        const score = parseInt(scoreInput.value, 10);
         if (!name || isNaN(score)) return;
 
         try {
             const res = await fetch('/api/leaderboard', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({name, score})
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, score })
             });
 
-            if (!res.ok) throw new Error('submit failed');
+            if (!res.ok) throw new Error('Failed to submit score');
 
-            await refresh();
+            await renderLeaderboard(containerId);
             form.reset();
         } catch (err) {
             alert('Failed to send score: ' + err.message);
         }
     });
-
-    backBtn.addEventListener('click', () => {
-        window.location.href = 'index.html';
-    });
-
-    refresh();
 }
+
+// Setup back button navigation
+function setupBackButton(buttonId, targetUrl = 'index.html') {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+    btn.addEventListener('click', () => window.location.href = targetUrl);
+}
+
+// Initialize leaderboard page
+function initLeaderboard({ containerId, formId, backBtnId }) {
+    renderLeaderboard(containerId);
+    setupScoreForm(formId, containerId);
+    setupBackButton(backBtnId);
+}
+
+// Export functions (if using modules)
+export { initLeaderboard, renderLeaderboard, setupScoreForm, setupBackButton };
