@@ -1,6 +1,7 @@
 {
   "name": "gold-rush-game",
   "version": "0.1.0",
+  "type": "module",
   "description": "Gold Rush game with global leaderboard on Render",
   "main": "server.js",
   "scripts": {
