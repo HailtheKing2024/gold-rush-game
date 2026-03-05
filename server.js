@@ -2,16 +2,29 @@ import express from "express";
 import cors from "cors";
 import { createClient } from "redis";
 import { nanoid } from "nanoid";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve all static frontend files from the project root (adjust if you move files)
+app.use(express.static(__dirname));
+
+// Serve the main page at root URL
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
 const REDIS_URL = process.env.REDIS_URL; // Aiven connection string
 const LEADERBOARD_KEY = "leaderboard_scores";
 const MAX_ENTRIES = 10;
 
-// Wrap connection in async IIFE
+// Connect to Redis with async IIFE
 const client = createClient({ url: REDIS_URL });
 (async () => {
   try {
@@ -19,7 +32,7 @@ const client = createClient({ url: REDIS_URL });
     console.log("Connected to Aiven Redis ✅");
   } catch (err) {
     console.error("Failed to connect to Redis:", err);
-    process.exit(1); // stop server if Redis connection fails
+    process.exit(1);
   }
 })();
 
@@ -40,10 +53,7 @@ app.post("/api/leaderboard", async (req, res) => {
     const { name, score } = req.body;
     if (!name || typeof score !== "number") return res.status(400).json({ error: "Bad input" });
 
-    // Add to sorted set
     await client.zAdd(LEADERBOARD_KEY, [{ value: name, score }]);
-
-    // Trim to top N
     await client.zRemRangeByRank(LEADERBOARD_KEY, 0, -MAX_ENTRIES - 1);
 
     res.status(201).json({ ok: true });
@@ -53,7 +63,7 @@ app.post("/api/leaderboard", async (req, res) => {
   }
 });
 
-// DELETE a score by name (optional)
+// DELETE score by name (optional)
 app.delete("/api/leaderboard/:name", async (req, res) => {
   try {
     const name = req.params.name;
