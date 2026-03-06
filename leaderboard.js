@@ -99,6 +99,11 @@ function initLeaderboard({ containerId, formId, backBtnId }) {
     setupScoreForm(formId, containerId);
     setupBackButton(backBtnId);
 }
+if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+    }
 
 // Export functions (if using modules)
 export { initLeaderboard, renderLeaderboard, setupScoreForm, setupBackButton };
