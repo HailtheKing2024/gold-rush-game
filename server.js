@@ -12,65 +12,80 @@ app.use(express.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Serve static frontend files
 app.use(express.static(__dirname));
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 
-const REDIS_URL = process.env.REDIS_URL; // Aiven Redis connection string
+const REDIS_URL = process.env.REDIS_URL; 
 const LEADERBOARD_KEY = "leaderboard_scores";
+const PLAYER_PREFIX = "player:"; // Redis 8 JSON keys
 const MAX_ENTRIES = 10;
 
-// Connect to Redis
 const client = createClient({ url: REDIS_URL });
+
+// REQUIRED: Redis 5.x+ requires an error listener to prevent process crashes
+client.on('error', err => console.error('Redis Client Error', err));
+
 (async () => {
   try {
     await client.connect();
-    console.log("Connected to Aiven Redis ✅");
+    console.log("Connected to Aiven Redis 8 ✅");
   } catch (err) {
     console.error("Failed to connect to Redis:", err);
     process.exit(1);
   }
 })();
 
-// GET leaderboard
+// GET leaderboard using Redis 8 JSON & Sorted Sets
 app.get("/api/leaderboard", async (req, res) => {
   try {
-    const top = await client.zRangeWithScores(LEADERBOARD_KEY, -MAX_ENTRIES, -1, { REV: true });
-    const parsed = top.map(e => {
-      try {
-        const obj = JSON.parse(e.value);
-        return {
-          id: obj.id,
-          name: obj.name,
-          score: obj.score,
-          timestamp: obj.timestamp // ISO string
-        };
-      } catch {
-        return { id: nanoid(), name: e.value, score: e.score, timestamp: null };
-      }
+    // 1. Get the top IDs and scores from the Sorted Set
+    const topMembers = await client.zRangeWithScores(LEADERBOARD_KEY, 0, MAX_ENTRIES - 1, { REV: true });
+    
+    if (topMembers.length === 0) return res.json([]);
+
+    // 2. Map IDs to their JSON keys
+    const keys = topMembers.map(m => `${PLAYER_PREFIX}${m.value}`);
+
+    // 3. Redis 8 Multi-get: Fetch all player JSON objects in one go
+    const playerStats = await client.json.mGet(keys, '$');
+
+    const result = topMembers.map((member, index) => {
+      const data = playerStats[index] ? playerStats[index][0] : {};
+      return {
+        id: member.value,
+        name: data.name || "Unknown",
+        score: member.score,
+        timestamp: data.timestamp
+      };
     });
-    res.json(parsed);
+
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error fetching leaderboard" });
   }
 });
 
-// POST new score
+// POST new score using Redis 8 JSON
 app.post("/api/leaderboard", async (req, res) => {
   try {
     const { name, score } = req.body;
     if (!name || typeof score !== "number") return res.status(400).json({ error: "Bad input" });
 
-    const entry = JSON.stringify({
-      id: nanoid(),
-      name,
-      score,
-      timestamp: new Date().toISOString() // ISO string timestamp
-    });
+    const id = nanoid();
+    const playerKey = `${PLAYER_PREFIX}${id}`;
 
-    await client.zAdd(LEADERBOARD_KEY, [{ value: entry, score }]);
-    await client.zRemRangeByRank(LEADERBOARD_KEY, 0, -MAX_ENTRIES - 1);
+    // Redis 8: Use a transaction (Multi) to ensure both set & score are saved together
+    await client.multi()
+      .json.set(playerKey, '$', {
+        id,
+        name,
+        timestamp: new Date().toISOString()
+      })
+      .zAdd(LEADERBOARD_KEY, { value: id, score })
+      // Automatically trim the leaderboard to keep it fast
+      .zRemRangeByRank(LEADERBOARD_KEY, 0, -(MAX_ENTRIES + 1)) 
+      .exec();
 
     res.status(201).json({ ok: true });
   } catch (err) {
@@ -79,26 +94,21 @@ app.post("/api/leaderboard", async (req, res) => {
   }
 });
 
-// DELETE score by name
-app.delete("/api/leaderboard/:name", async (req, res) => {
+// DELETE score by ID (Faster in Redis 8)
+app.delete("/api/leaderboard/:id", async (req, res) => {
   try {
-    const nameToRemove = req.params.name;
-    if (!nameToRemove) return res.status(400).json({ error: "Name required" });
+    const id = req.params.id;
+    const playerKey = `${PLAYER_PREFIX}${id}`;
 
-    const allEntries = await client.zRange(LEADERBOARD_KEY, 0, -1);
-    const toRemove = allEntries.filter(entry => {
-      try {
-        const obj = JSON.parse(entry);
-        return obj.name === nameToRemove;
-      } catch {
-        return false;
-      }
-    });
+    // Delete from both the index (Sorted Set) and the data (JSON)
+    const [removedFromSet] = await client.multi()
+      .zRem(LEADERBOARD_KEY, id)
+      .del(playerKey)
+      .exec();
 
-    if (toRemove.length === 0) return res.status(404).json({ error: "Name not found" });
+    if (removedFromSet === 0) return res.status(404).json({ error: "Player not found" });
 
-    const removedCount = await client.zRem(LEADERBOARD_KEY, ...toRemove);
-    res.json({ ok: true, removed: removedCount });
+    res.json({ ok: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error deleting score" });
