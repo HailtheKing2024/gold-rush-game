@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Banner animation
     let bannerX = window.innerWidth;
-    const bannerSpeed = 2;
+    const bannerSpeed = 1;
 
     function animateBanner() {
         bannerX -= bannerSpeed;
