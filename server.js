@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import { createClient } from "redis";
-import { nanoid } from "nanoid";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -17,11 +16,11 @@ app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 
 const REDIS_URL = process.env.REDIS_URL; 
 const LEADERBOARD_KEY = "leaderboard_scores";
+const PLAYER_META_KEY = "player_metadata"; // Hash to store dates/extra info
 const MAX_ENTRIES = 10;
 
 const client = createClient({ url: REDIS_URL });
 
-// V5 CRITICAL: Prevent process crashes on network blips
 client.on('error', err => console.error('Redis Client Error', err));
 
 (async () => {
@@ -34,70 +33,69 @@ client.on('error', err => console.error('Redis Client Error', err));
   }
 })();
 
-// GET: Modern v5 Syntax
+// GET: Fetch top players and match them with their timestamps
 app.get("/api/leaderboard", async (req, res) => {
   try {
-    // REV: true gets the highest scores first
+    // 1. Get the top Names and Scores (REV: true gets highest first)
     const top = await client.zRangeWithScores(LEADERBOARD_KEY, 0, MAX_ENTRIES - 1, { REV: true });
     
-    const parsed = top.map(e => {
-      try {
-        return JSON.parse(e.value);
-      } catch {
-        // Fallback for any old/corrupt data in your Redis
-        return { name: "Player", score: e.score, timestamp: new Date().toISOString() };
-      }
-    });
+    if (top.length === 0) return res.json([]);
+
+    // 2. Fetch all timestamps for these players in one round-trip (MGET from a Hash)
+    const names = top.map(e => e.value);
+    const timestamps = await client.hmGet(PLAYER_META_KEY, names);
+
+    // 3. Combine score and timestamp for the frontend
+    const result = top.map((e, index) => ({
+      name: e.value,
+      score: e.score,
+      timestamp: timestamps[index] || new Date().toISOString()
+    }));
     
-    res.json(parsed);
+    res.json(result);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error fetching leaderboard" });
   }
 });
 
-// POST: Fixed for Node Redis v5 and Aiven compatibility
+// POST: Add or Update score ONLY if it is higher (Redis 8 GT flag)
 app.post("/api/leaderboard", async (req, res) => {
   try {
     const { name, score } = req.body;
     if (!name || typeof score !== "number") return res.status(400).json({ error: "Bad input" });
 
-    const entry = JSON.stringify({
-      id: nanoid(),
-      name,
-      score,
-      timestamp: new Date().toISOString() 
-    });
+    // Redis 8 'GT' (Greater Than) flag: 
+    // Updates the score only if the new score is higher than the current one.
+    // If the player doesn't exist, it adds them normally.
+    const updateResult = await client.zAdd(LEADERBOARD_KEY, 
+      { value: name, score: score }, 
+      { GT: true } 
+    );
 
-    // In v5, zAdd takes an object inside an array
-    await client.zAdd(LEADERBOARD_KEY, [{ value: entry, score }]);
-    
-    // Trim to top 10
-    await client.zRemRangeByRank(LEADERBOARD_KEY, 0, -MAX_ENTRIES - 1);
+    // Only update the timestamp if the score was actually updated or newly added
+    // zAdd returns 1 for new, or null/0 if GT condition wasn't met (in some client versions)
+    if (updateResult !== 0) {
+      await client.hSet(PLAYER_META_KEY, name, new Date().toISOString());
+    }
 
-    res.status(201).json({ ok: true });
+    res.status(201).json({ ok: true, updated: updateResult !== 0 });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error saving score" });
   }
 });
 
-// DELETE: Fixed search logic for Aiven
+// DELETE: Now much faster (O(1) instead of searching strings)
 app.delete("/api/leaderboard/:name", async (req, res) => {
   try {
-    const nameToRemove = req.params.name;
-    const allEntries = await client.zRange(LEADERBOARD_KEY, 0, -1);
+    const name = req.params.name;
     
-    const toRemove = allEntries.filter(entry => {
-      try {
-        return JSON.parse(entry).name === nameToRemove;
-      } catch { return false; }
-    });
-
-    if (toRemove.length > 0) {
-      // v5: Pass the array directly to zRem
-      await client.zRem(LEADERBOARD_KEY, toRemove);
-    }
+    // Multi ensures both the score and metadata are removed together
+    await client.multi()
+      .zRem(LEADERBOARD_KEY, name)
+      .hDel(PLAYER_META_KEY, name)
+      .exec();
 
     res.json({ ok: true });
   } catch (err) {
