@@ -10,12 +10,4 @@ This project is a fan-made remake of _The Oregon Trail_. It is being built compl
 - 🧪 Prototype build
 - 🔄 Frequent updates and changes
 
-(DEV STUFF ONLY)
-If you're contributing, **always pull the latest version before making any changes**:
-When initializing venv always make sure to install from the requirements.txt file.
-Help is appreciatted on how to make this a webpage.
-
-Be sure to check out the real game on https://goldrushgame.netlify.app/index.html!
-
-check
-
+The final version can be found on https://gold-rush-game.onrender.com/
