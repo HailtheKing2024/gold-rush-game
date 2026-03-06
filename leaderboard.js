@@ -101,7 +101,7 @@ function initLeaderboard({ containerId, formId, backBtnId }) {
 }
 if (backBtn) {
         backBtn.addEventListener('click', () => {
-            window.location.href = 'index.html';
+            window.history.back();
         });
     }
 
