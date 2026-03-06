@@ -37,6 +37,11 @@ newSaveBtn.addEventListener("click", () => {
 howToPlayBtn.addEventListener("click", () => {
     window.location.href = "tutorial.html";
 });
-
+ const btn = document.getElementById('leaderboardBtn');
+    if (btn){
+        btn.addEventListener('click', () => {
+            window.location.href = 'leaderboard.html';
+        });
+    }
 // Start animation
 animateBanner();
