@@ -21,12 +21,18 @@ app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 // A. PostgreSQL Setup (Aiven via Render ENV)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // Required for Aiven/Render
+  ssl: {
+    // This is the key fix for the "self-signed certificate" error
+    rejectUnauthorized: false 
+  }
 });
 
 pool.connect((err) => {
-  if (err) console.error('PostgreSQL Connection Error ❌', err.stack);
-  else console.log('Connected to Aiven PostgreSQL ✅');
+  if (err) {
+    console.error('PostgreSQL Connection Error ❌', err.stack);
+  } else {
+    console.log('Connected to Aiven PostgreSQL ✅');
+  }
 });
 
 // B. Redis Setup (Leaderboard)
