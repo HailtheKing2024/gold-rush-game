@@ -1,11 +1,31 @@
 // homepage.js
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async()  => {
     // Elements
     const banner = document.querySelector(".banner");
     const newSaveBtn = document.getElementById("newSaveBtn");
     const howToPlayBtn = document.getElementById("howToPlayBtn");
     const leaderboardBtn = document.getElementById("leaderboardBtn");
+    const continueBtn = document.getElementById('continueBtn');
+    const savedName = localStorage.getItem("playerName");
+
+    if (savedName) {
+        try {
+            // Ask the server if this name actually exists in PostgreSQL
+            const response = await fetch(`/api/check-save/${savedName}`);
+            const data = await response.json();
+
+            if (data.exists) {
+                // Save found! Enable the button and set the link
+                continueBtn.disabled = false;
+                continueBtn.style.opacity = "1";
+                continueBtn.style.cursor = "pointer";
+                continueBtn.onclick = () => { window.location.href = "gameplay.html"; };
+            }
+        } catch (err) {
+            console.error("Could not verify save:", err);
+        }
+    }
 
     // Banner animation
     let bannerX = window.innerWidth;

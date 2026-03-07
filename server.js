@@ -145,6 +145,19 @@ app.delete("/api/leaderboard/:name", async (req, res) => {
     res.status(500).json({ error: "Error deleting score" });
   }
 });
+// GET: Check if a specific player has a save
+app.get("/api/check-save/:name", async (req, res) => {
+  try {
+    const { name } = req.params;
+    const result = await pool.query("SELECT 1 FROM game_saves WHERE player_name = $1", [name]);
+    
+    // Returns true if a row was found, false otherwise
+    res.json({ exists: result.rowCount > 0 });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Database check failed" });
+  }
+});
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
