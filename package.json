@@ -5,9 +5,12 @@
   "description": "Gold Rush game with global leaderboard on Render",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
-  },
+  "start": "node server.js",
+  "dev": "node server.js",
+  "lint": "eslint .",
+  "test": "jest",
+  "posttest": "echo 'Pre-flight successful! Ready to ship to Render.'"
+},
   "dependencies": {
     "cors": "^2.8.6",
     "express": ">=4.18.2",
@@ -18,5 +21,10 @@
   },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.0.3",
+    "jest": "^30.3.0"
   }
 }

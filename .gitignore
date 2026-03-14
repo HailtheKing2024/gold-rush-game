@@ -4,3 +4,4 @@ Modelfile
 .claude/
 CLAUDE.md
 .mcp.json
+node_modules/
