@@ -1,5 +1,6 @@
 game/
 node_modules/
-Modelfile 
+Modelfile
 .claude/
 CLAUDE.md
+.mcp.json
