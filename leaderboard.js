@@ -1,6 +1,8 @@
 // helper to query API
+const convexSiteUrl = window.CONVEX_SITE_URL || "https://fastidious-heron-446.convex.site";
+
 async function fetchScores() {
-    const res = await fetch('/api/leaderboard');
+    const res = await fetch(`${convexSiteUrl}/api/leaderboard`);
     if (!res.ok) throw new Error('Failed to load scores');
     return res.json(); // each entry now includes id, score, name, timestamp
 }
@@ -72,7 +74,7 @@ if (document.getElementById('scores-container')) {
         if (!name || isNaN(score)) return;
 
         try {
-            const res = await fetch('/api/leaderboard', {
+            const res = await fetch(`${convexSiteUrl}/api/leaderboard`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({name, score})

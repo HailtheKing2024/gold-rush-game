@@ -19,6 +19,8 @@
     </div>
 
     <script>
+        const convexSiteUrl = window.CONVEX_SITE_URL || "https://fastidious-heron-446.convex.site";
+
         // 1. Show the role they picked on the previous page
         const role = localStorage.getItem("selectedRole");
         const stats = JSON.parse(localStorage.getItem("roleStats"));
@@ -40,10 +42,10 @@
 
             status.className = "";
             status.classList.add("status-saving");
-            status.innerText = "Saving to Aiven PostgreSQL...";
+            status.innerText = "Saving to Convex...";
 
             try {
-                const response = await fetch("/api/save-game", {
+                const response = await fetch(`${convexSiteUrl}/api/save-game`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({

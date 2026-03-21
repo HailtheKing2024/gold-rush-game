@@ -1,9 +1,11 @@
 import pluginJs from "@eslint/js";
 
 export default [
+  {
+    ignores: ["node_modules/**", "convex/_generated/**"],
+  },
   pluginJs.configs.recommended,
   {
-    ignores: ["node_modules/**"],
     rules: {
       "no-unused-vars": "warn",
       "no-console": "off"

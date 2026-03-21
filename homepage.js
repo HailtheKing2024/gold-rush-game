@@ -1,6 +1,7 @@
 // homepage.js
 
 document.addEventListener('DOMContentLoaded', async()  => {
+    const convexSiteUrl = window.CONVEX_SITE_URL || "https://fastidious-heron-446.convex.site";
     // Elements
     const banner = document.querySelector(".banner");
     const newSaveBtn = document.getElementById("newSaveBtn");
@@ -11,8 +12,8 @@ document.addEventListener('DOMContentLoaded', async()  => {
 
     if (savedName) {
         try {
-            // Ask the server if this name actually exists in PostgreSQL
-            const response = await fetch(`/api/check-save/${savedName}`);
+            // Ask the backend if this save exists in Convex
+            const response = await fetch(`${convexSiteUrl}/api/check-save?name=${encodeURIComponent(savedName)}`);
             const data = await response.json();
 
             if (data.exists) {
