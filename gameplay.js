@@ -1,4 +1,3 @@
-/* global document, window */
 (function () {
   var menu = document.getElementById("toMenuBtn");
   var board = document.getElementById("toLeaderboardBtn");

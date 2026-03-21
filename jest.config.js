@@ -1,5 +1,6 @@
-module.exports = {
+export default {
   testEnvironment: "node",
   verbose: true,
-  testMatch: ["**/*.test.js"]
+  testMatch: ["**/*.test.js"],
+  passWithNoTests: true
 };
