@@ -9,11 +9,13 @@ async function fetchScores() {
 function formatScore(entry, rank) {
     const date = new Date(entry.timestamp);
 
-    let color = ''; // default color for other ranks
-    if (rank === 1) color = 'gold';
-    else if (rank === 2) color = 'silver';
-    else if (rank === 3) color = '#cd7f32'; // bronze
-    else color = '#444'; // darker gray for the rest
+    const color = rank === 1
+        ? 'gold'
+        : rank === 2
+            ? 'silver'
+            : rank === 3
+                ? '#cd7f32' // bronze
+                : '#444'; // darker gray for the rest
 
     return `<tr style="color:${color}">
                 <td>${rank}</td>
