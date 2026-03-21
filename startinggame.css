@@ -33,8 +33,9 @@ body {
 
 .tutorial-container h1 {
     font-family: "ByteBounce", sans-serif;
-    font-size: 80px;
+    font-size: clamp(2.25rem, 9vw, 5rem);
     margin-bottom: 30px;
+    line-height: 1.05;
 }
 
 .tutorial-container p {
@@ -84,4 +85,40 @@ body {
     font-size: 24px;
     min-height: 35px;
     margin-top: 20px;
+    color: #e8c547;
+    max-width: 90vw;
+    line-height: 1.4;
+}
+
+/* Save / loading feedback */
+#status.status-saving {
+    color: #9ad0ff;
+}
+
+#status.status-success {
+    color: #7dffb3;
+    text-shadow: 0 0 12px rgba(125, 255, 179, 0.35);
+}
+
+#status.status-error {
+    color: #ff8a8a;
+}
+
+/* Subtle frame around the name step (last screen before gameplay) */
+.tutorial-container #playerNameInput,
+.tutorial-container #startBtn {
+    position: relative;
+    z-index: 1;
+}
+
+.tutorial-container::before {
+    content: "";
+    position: absolute;
+    inset: 24px 12px;
+    border: 2px solid rgba(212, 175, 55, 0.35);
+    border-radius: 12px;
+    pointer-events: none;
+    box-shadow:
+        0 0 40px rgba(212, 175, 55, 0.08),
+        inset 0 0 60px rgba(0, 0, 0, 0.45);
 }

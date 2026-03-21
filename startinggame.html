@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gold Rush - Name Your Explorer</title>
+    <link rel="stylesheet" href="startinggame.css" />
 </head>
 <body>
-    <h1>Welcome, Explorer!</h1>
+    <div class="tutorial-container" aria-labelledby="starting-heading">
+    <h1 id="starting-heading">Welcome, Explorer!</h1>
     <div id="role-display"></div>
     
     <p>Enter a name to begin your journey:</p>
-    <input type="text" id="playerNameInput" placeholder="Enter name...">
-    <button id="startBtn">Start Game & Save</button>
+    <input type="text" id="playerNameInput" placeholder="Enter name..." maxlength="40" autocomplete="nickname" />
+    <button type="button" id="startBtn">Start Game & Save</button>
 
-    <p id="status"></p>
+    <p id="status" role="status" aria-live="polite"></p>
+    </div>
 
     <script>
         // 1. Show the role they picked on the previous page
@@ -35,6 +38,8 @@
                 return;
             }
 
+            status.className = "";
+            status.classList.add("status-saving");
             status.innerText = "Saving to Aiven PostgreSQL...";
 
             try {
@@ -49,16 +54,22 @@
                 });
 
                 if (response.ok) {
+                    status.className = "";
+                    status.classList.add("status-success");
                     status.innerText = `Game Saved for ${name}! Loading world...`;
                     localStorage.setItem("playerName", name); // Save name for later
                     
                     // Optional: Move to the actual gameplay screen after 1.5 seconds
                      setTimeout(() => { window.location.href = "gameplay.html"; }, 1500);
                 } else {
+                    status.className = "";
+                    status.classList.add("status-error");
                     status.innerText = "Save failed. Check server logs.";
                 }
             } catch (err) {
                 console.error(err);
+                status.className = "";
+                status.classList.add("status-error");
                 status.innerText = "Error connecting to server.";
             }
         });
