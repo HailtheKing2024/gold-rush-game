@@ -5,3 +5,4 @@ Modelfile
 CLAUDE.md
 .mcp.json
 node_modules/
+.cursor/
