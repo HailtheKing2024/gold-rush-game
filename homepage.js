@@ -1,7 +1,9 @@
 // homepage.js
+import { ConvexClient } from "https://esm.sh/convex@1.34.0/browser";
 
 document.addEventListener('DOMContentLoaded', async()  => {
-    const convexSiteUrl = window.CONVEX_SITE_URL || "https://fastidious-heron-446.convex.site";
+    const convexUrl = window.CONVEX_URL || "https://fastidious-heron-446.convex.cloud";
+    const client = new ConvexClient(convexUrl);
     // Elements
     const banner = document.querySelector(".banner");
     const newSaveBtn = document.getElementById("newSaveBtn");
@@ -9,20 +11,23 @@ document.addEventListener('DOMContentLoaded', async()  => {
     const leaderboardBtn = document.getElementById("leaderboardBtn");
     const continueBtn = document.getElementById('continueBtn');
     const savedName = localStorage.getItem("playerName");
+    let unsubscribe = null;
+
+    function setContinueEnabled(enabled) {
+        continueBtn.disabled = !enabled;
+        continueBtn.style.opacity = enabled ? "1" : "";
+        continueBtn.style.cursor = enabled ? "pointer" : "";
+        continueBtn.onclick = enabled ? () => { window.location.href = "gameplay.html"; } : null;
+    }
 
     if (savedName) {
         try {
-            // Ask the backend if this save exists in Convex
-            const response = await fetch(`${convexSiteUrl}/api/check-save?name=${encodeURIComponent(savedName)}`);
-            const data = await response.json();
-
-            if (data.exists) {
-                // Save found! Enable the button and set the link
-                continueBtn.disabled = false;
-                continueBtn.style.opacity = "1";
-                continueBtn.style.cursor = "pointer";
-                continueBtn.onclick = () => { window.location.href = "gameplay.html"; };
-            }
+            unsubscribe = client.onUpdate(
+                "games:checkSave",
+                { name: savedName },
+                (exists) => setContinueEnabled(!!exists),
+                (err) => console.error("Could not verify save:", err)
+            );
         } catch (err) {
             console.error("Could not verify save:", err);
         }
@@ -69,5 +74,12 @@ document.addEventListener('DOMContentLoaded', async()  => {
             window.location.href = "leaderboard.html";
         });
     }
-    
+
+    window.addEventListener("beforeunload", () => {
+        if (unsubscribe) {
+            unsubscribe();
+            unsubscribe = null;
+        }
+        client.close();
+    });
 });

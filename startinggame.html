@@ -18,8 +18,10 @@
     <p id="status" role="status" aria-live="polite"></p>
     </div>
 
-    <script>
-        const convexSiteUrl = window.CONVEX_SITE_URL || "https://fastidious-heron-446.convex.site";
+    <script type="module">
+        import { ConvexHttpClient } from "https://esm.sh/convex@1.34.0/browser";
+        const convexUrl = window.CONVEX_URL || "https://fastidious-heron-446.convex.cloud";
+        const client = new ConvexHttpClient(convexUrl);
 
         // 1. Show the role they picked on the previous page
         const role = localStorage.getItem("selectedRole");
@@ -45,34 +47,24 @@
             status.innerText = "Saving to Convex...";
 
             try {
-                const response = await fetch(`${convexSiteUrl}/api/save-game`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
+                await client.mutation("games:saveGame", {
                         name: name,
                         role: role,
                         stats: stats
-                    })
                 });
 
-                if (response.ok) {
-                    status.className = "";
-                    status.classList.add("status-success");
-                    status.innerText = `Game Saved for ${name}! Loading world...`;
-                    localStorage.setItem("playerName", name); // Save name for later
-                    
-                    // Optional: Move to the actual gameplay screen after 1.5 seconds
-                     setTimeout(() => { window.location.href = "gameplay.html"; }, 1500);
-                } else {
-                    status.className = "";
-                    status.classList.add("status-error");
-                    status.innerText = "Save failed. Check server logs.";
-                }
+                status.className = "";
+                status.classList.add("status-success");
+                status.innerText = `Game Saved for ${name}! Loading world...`;
+                localStorage.setItem("playerName", name); // Save name for later
+                
+                // Optional: Move to the actual gameplay screen after 1.5 seconds
+                 setTimeout(() => { window.location.href = "gameplay.html"; }, 1500);
             } catch (err) {
                 console.error(err);
                 status.className = "";
                 status.classList.add("status-error");
-                status.innerText = "Error connecting to server.";
+                status.innerText = "Error saving to Convex.";
             }
         });
     </script>

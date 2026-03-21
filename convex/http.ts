@@ -3,13 +3,38 @@ import { httpAction } from "./_generated/server";
 import { api } from "./_generated/api";
 
 const http = httpRouter();
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+function withCors(body: unknown, init?: ResponseInit) {
+  return Response.json(body, {
+    ...init,
+    headers: {
+      ...corsHeaders,
+      ...(init?.headers ?? {}),
+    },
+  });
+}
+
+function preflight() {
+  return new Response(null, { status: 204, headers: corsHeaders });
+}
+
+http.route({
+  path: "/api/leaderboard",
+  method: "OPTIONS",
+  handler: httpAction(async () => preflight()),
+});
 
 http.route({
   path: "/api/leaderboard",
   method: "GET",
   handler: httpAction(async (ctx) => {
     const scores = await ctx.runQuery(api.leaderboard.getTopScores, {});
-    return Response.json(scores);
+    return withCors(scores);
   }),
 });
 
@@ -22,11 +47,11 @@ http.route({
     const score = body?.score;
 
     if (typeof name !== "string" || typeof score !== "number") {
-      return Response.json({ error: "Bad input" }, { status: 400 });
+      return withCors({ error: "Bad input" }, { status: 400 });
     }
 
     await ctx.runMutation(api.leaderboard.updateScore, { name, score });
-    return Response.json({ ok: true }, { status: 201 });
+    return withCors({ ok: true }, { status: 201 });
   }),
 });
 
@@ -37,12 +62,18 @@ http.route({
     const url = new URL(req.url);
     const name = url.searchParams.get("name");
     if (!name) {
-      return Response.json({ error: "Missing name" }, { status: 400 });
+      return withCors({ error: "Missing name" }, { status: 400 });
     }
 
     await ctx.runMutation(api.leaderboard.deleteScore, { name });
-    return Response.json({ ok: true });
+    return withCors({ ok: true });
   }),
+});
+
+http.route({
+  path: "/api/save-game",
+  method: "OPTIONS",
+  handler: httpAction(async () => preflight()),
 });
 
 http.route({
@@ -55,12 +86,18 @@ http.route({
     const stats = body?.stats;
 
     if (typeof name !== "string" || typeof role !== "string" || typeof stats !== "object" || stats === null) {
-      return Response.json({ error: "Missing player name, role, or stats" }, { status: 400 });
+      return withCors({ error: "Missing player name, role, or stats" }, { status: 400 });
     }
 
     await ctx.runMutation(api.games.saveGame, { name, role, stats });
-    return Response.json({ ok: true, message: "Game saved to Convex" }, { status: 201 });
+    return withCors({ ok: true, message: "Game saved to Convex" }, { status: 201 });
   }),
+});
+
+http.route({
+  path: "/api/check-save",
+  method: "OPTIONS",
+  handler: httpAction(async () => preflight()),
 });
 
 http.route({
@@ -70,11 +107,11 @@ http.route({
     const url = new URL(req.url);
     const name = url.searchParams.get("name");
     if (!name) {
-      return Response.json({ exists: false }, { status: 200 });
+      return withCors({ exists: false }, { status: 200 });
     }
 
     const exists = await ctx.runQuery(api.games.checkSave, { name });
-    return Response.json({ exists });
+    return withCors({ exists });
   }),
 });
 

@@ -1,11 +1,7 @@
-// helper to query API
-const convexSiteUrl = window.CONVEX_SITE_URL || "https://fastidious-heron-446.convex.site";
+import { ConvexClient } from "https://esm.sh/convex@1.34.0/browser";
 
-async function fetchScores() {
-    const res = await fetch(`${convexSiteUrl}/api/leaderboard`);
-    if (!res.ok) throw new Error('Failed to load scores');
-    return res.json(); // each entry now includes id, score, name, timestamp
-}
+const convexUrl = window.CONVEX_URL || "https://fastidious-heron-446.convex.cloud";
+const client = new ConvexClient(convexUrl);
 
 // format a single score entry with rank
 function formatScore(entry, rank) {
@@ -39,10 +35,10 @@ if (document.getElementById('scores-container')) {
     const container = document.getElementById('scores-container');
     const form = document.getElementById('scoreForm');
     const backBtn = document.getElementById('backBtn');
+    let unsubscribe = null;
 
-    async function refresh() {
+    function renderScores(scores) {
         try {
-            const scores = await fetchScores();
             if (scores.length === 0) {
                 container.innerHTML = '<p>No scores yet.</p>';
                 return;
@@ -74,15 +70,7 @@ if (document.getElementById('scores-container')) {
         if (!name || isNaN(score)) return;
 
         try {
-            const res = await fetch(`${convexSiteUrl}/api/leaderboard`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({name, score})
-            });
-
-            if (!res.ok) throw new Error('submit failed');
-
-            await refresh();
+            await client.mutation("leaderboard:updateScore", { name, score });
             form.reset();
         } catch (err) {
             alert('Failed to send score: ' + err.message);
@@ -93,5 +81,20 @@ if (document.getElementById('scores-container')) {
         window.location.href = 'index.html';
     });
 
-    refresh();
+    unsubscribe = client.onUpdate(
+        "leaderboard:getTopScores",
+        {},
+        (scores) => renderScores(scores),
+        (err) => {
+            container.innerHTML = `<p>Error loading leaderboard: ${err.message}</p>`;
+        }
+    );
+
+    window.addEventListener("beforeunload", () => {
+        if (unsubscribe) {
+            unsubscribe();
+            unsubscribe = null;
+        }
+        client.close();
+    });
 }
