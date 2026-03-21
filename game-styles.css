@@ -24,6 +24,9 @@ body {
   align-items: center;
   color: gold;
   text-align: center;
+  box-sizing: border-box;
+  /* Reserve space so the absolute-positioned banner doesn't overlap bottom buttons. */
+  padding-bottom: 70px;
 }
 
 /* Title */
@@ -49,6 +52,8 @@ button {
   cursor: pointer;
   transition: 0.2s;
   margin-top: 20px;
+  position: relative;
+  z-index: 2;
 }
 
 /* Individual margins for the first button */
@@ -73,7 +78,10 @@ button:hover {
 /* Scrolling banner */
 .banner {
   position: absolute;
-  bottom: 10px;
+  bottom: 0px;
   white-space: nowrap;
   font-size: 22px;
+  line-height: 1.2;
+  z-index: 1;
+  pointer-events: none;
 }
