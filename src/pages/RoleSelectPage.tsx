@@ -3,8 +3,9 @@ import {
   computeFinalStats,
   formatRoleStatsLine,
   type RoleKey,
-} from "../game/roles";
+} from "../game/roles"; // Corrected path to go up into 'game' folder
 import "../styles/roleselect.css";
+
 
 const ROLE_ORDER: RoleKey[] = ["merchant", "miner", "hunter"];
 const ROLE_LABELS: Record<RoleKey, string> = {
