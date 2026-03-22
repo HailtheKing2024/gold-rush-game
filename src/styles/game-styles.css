@@ -1,7 +1,7 @@
-/* Load custom font */
+/* Load custom font — place ByteBounce.ttf in /public */
 @font-face {
   font-family: "ByteBounce";
-  src: url("ByteBounce.ttf") format("truetype");
+  src: url("/ByteBounce.ttf") format("truetype");
 }
 
 /* Reset */

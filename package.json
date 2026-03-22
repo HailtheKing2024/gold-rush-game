@@ -4,23 +4,37 @@
   "type": "module",
   "description": "Gold Rush game with global leaderboard on Render",
   "scripts": {
-    "dev": "npx convex dev",
-    "start": "serve . -l ${PORT:-3000}",
-    "build": "npx convex codegen",
+    "dev": "vite",
+    "dev:convex": "npx convex dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "serve dist -s -l ${PORT:-3000}",
+    "convex:codegen": "npx convex codegen",
     "lint": "eslint .",
     "test": "jest",
     "posttest": "echo 'Pre-flight successful! Ready to ship to Render.'"
   },
   "dependencies": {
     "convex": "^1.34.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.13.1",
     "serve": "^14.2.6"
   },
   "engines": {
     "node": ">=22.0.0"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.0.3",
-    "jest": "^30.3.0"
+    "@eslint/js": "^9.21.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.21.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "jest": "^30.3.0",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.0",
+    "vite": "^6.1.0"
   }
 }
