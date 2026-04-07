@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import { HomePage } from "./pages/HomePage";
 import { RoleSelectPage } from "./pages/RoleSelectPage";
 import { NameEntryPage } from "./pages/NameEntryPage";
@@ -20,6 +21,7 @@ export function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Analytics />
+      <SpeedInsights />
     </>
   );
 }
